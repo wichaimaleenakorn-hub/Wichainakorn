@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ฟอร์มสัญญาเช่าซื้อมือถือ</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f4f0; --surface: #ffffff; --surface2: #f0ede8;
+    --border: #ddd9d2; --border2: #c8c3bb;
+    --text: #1a1a18; --text2: #6b6660; --text3: #9c9892;
+    --danger: #8b2020; --success: #1e6b3a;
+    --radius: 10px; --radius-sm: 6px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+    /* shop 1 = blue */
+    --s1-accent: #1a5c8a; --s1-light: #e3f0fa; --s1-text: #0f3a5c; --s1-border: #a8cce0;
+    /* shop 2 = green */
+    --s2-accent: #2d7a3d; --s2-light: #e6f4ea; --s2-text: #1a4a24; --s2-border: #a8d4b0;
+    /* shop 3 = pastel green */
+    --s3-accent: #5a9e6a; --s3-light: #f0f9f2; --s3-text: #2e5c38; --s3-border: #b8ddc0;
+    /* active shop colors (default shop1) */
+    --accent: #1a5c8a; --accent-light: #e3f0fa; --accent-text: #0f3a5c;
+  }
+  body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.6; min-height: 100vh; padding: 24px 16px 60px; }
+  .wrapper { max-width: 780px; margin: 0 auto; }
+  .app-header { text-align: center; margin-bottom: 20px; }
+  .app-header h1 { font-size: 22px; font-weight: 600; }
+  .app-header p { font-size: 13px; color: var(--text3); margin-top: 4px; }
+
+  .shop-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+  .shop-tab { flex: 1; padding: 10px 6px; border-radius: var(--radius); border: 2px solid var(--border); background: var(--surface); cursor: pointer; text-align: center; font-family: 'Sarabun', sans-serif; font-size: 13px; font-weight: 500; color: var(--text2); transition: all 0.15s; line-height: 1.4; }
+  .shop-tab.s1.active { border-color: var(--s1-accent); background: var(--s1-light); color: var(--s1-text); }
+  .shop-tab.s2.active { border-color: var(--s2-accent); background: var(--s2-light); color: var(--s2-text); }
+  .shop-tab.s3.active { border-color: var(--s3-accent); background: var(--s3-light); color: var(--s3-text); }
+  .shop-tab:hover:not(.active) { background: var(--surface2); }
+  @media (max-width: 580px) { .shop-tabs { flex-direction: column; } .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+  .card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); padding: 24px; margin-bottom: 16px; }
+  .card.s1 { border-top: 3px solid var(--s1-accent); }
+  .card.s2 { border-top: 3px solid var(--s2-accent); }
+  .card.s3 { border-top: 3px solid var(--s3-accent); }
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+  .card-title { font-size: 14px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; }
+  .card-title .icon { width: 28px; height: 28px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .s1 .icon { background: var(--s1-light); }
+  .s2 .icon { background: var(--s2-light); }
+  .s3 .icon { background: var(--s3-light); }
+  .section-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin: 20px 0 12px; }
+  .section-label:first-child { margin-top: 0; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 12px; color: var(--text2); font-weight: 500; }
+  .field input { width: 100%; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: 'Sarabun', sans-serif; font-size: 14px; color: var(--text); background: var(--surface); outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
+  .field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,0,0,0.07); }
+  .field input::placeholder { color: var(--text3); }
+  .field input[readonly] { background: var(--surface2); color: var(--text2); cursor: default; }
+  .lock-left p { font-size: 14px; color: var(--text); font-weight: 500; }
+  .lock-left span { font-size: 12px; color: var(--text3); }
+  .lock-pin-row { display: flex; gap: 8px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
+  .lock-pin-row input { width: 160px; padding: 8px 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: 'Sarabun', sans-serif; font-size: 15px; letter-spacing: 3px; text-align: center; outline: none; }
+  .pin-hint { font-size: 11px; color: var(--text3); margin-top: 6px; }
+  .pin-error { font-size: 12px; color: var(--danger); margin-top: 4px; display: none; }
+  .pw-msg { font-size: 12px; margin-top: 6px; display: none; }
+  .logo-area { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px; }
+  .logo-box { width: 70px; height: 70px; flex-shrink: 0; border: 2px dashed var(--border2); border-radius: var(--radius-sm); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; color: var(--text3); font-size: 11px; text-align: center; gap: 3px; }
+  .logo-preview-img { width: 70px; height: 70px; object-fit: contain; border-radius: var(--radius-sm); border: 1px solid var(--border); flex-shrink: 0; display: none; }
+  .logo-remove { font-size: 11px; color: var(--text3); background: none; border: none; cursor: pointer; margin-top: 4px; display: none; text-decoration: underline; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 9px 18px; border-radius: var(--radius-sm); font-family: 'Sarabun', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.15s; border: 1.5px solid transparent; }
+  .btn-s1 { background: var(--s1-accent); color: #fff; border-color: var(--s1-accent); }
+  .btn-s2 { background: var(--s2-accent); color: #fff; border-color: var(--s2-accent); }
+  .btn-s3 { background: var(--s3-accent); color: #fff; border-color: var(--s3-accent); }
+  .btn-outline { background: transparent; color: var(--text2); border-color: var(--border2); }
+  .btn-outline:hover { background: var(--surface2); }
+  .btn-save { background: #1a4a8a; color: #fff; border-color: #1a4a8a; }
+  .btn-sm { padding: 6px 14px; font-size: 13px; }
+  .btn-block { width: 100%; margin-top: 20px; padding: 13px; font-size: 15px; }
+  .btn-clear { width: 100%; margin-top: 8px; padding: 10px; font-size: 13px; }
+  .hint-box { border-radius: var(--radius-sm); padding: 9px 13px; font-size: 12px; margin-bottom: 14px; display: flex; gap: 7px; align-items: flex-start; }
+  .hint-s1 { background: var(--s1-light); border: 1px solid var(--s1-border); color: var(--s1-text); }
+  .hint-s2 { background: var(--s2-light); border: 1px solid var(--s2-border); color: var(--s2-text); }
+  .hint-s3 { background: var(--s3-light); border: 1px solid var(--s3-border); color: var(--s3-text); }
+  .save-box { background: #e8f0fa; border: 1px solid #b8cce8; border-radius: var(--radius-sm); padding: 12px 14px; margin-top: 16px; }
+  .save-box p { font-size: 12px; color: #1a4a8a; margin-bottom: 8px; }
+  .pw-section { border-top: 1px solid var(--border); padding-top: 16px; margin-top: 16px; }
+  .pw-section-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 10px; }
+  .save-status { font-size: 12px; margin-top: 6px; display: none; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="app-header">
+    <h1>ฟอร์มสัญญาเช่าซื้อมือถือ</h1>
+    <p>เลือกร้านแล้วกรอกข้อมูล กดพิมพ์สัญญาได้เลย</p>
+  </div>
+
+  <div class="shop-tabs">
+    <button class="shop-tab s1 active" id="tab1" onclick="switchShop(1)">🔵 วิชัยมาลี<br>เมืองนคร</button>
+    <button class="shop-tab s2" id="tab2" onclick="switchShop(2)">🟢 วิชัย<br>ผ่อนไอโฟน</button>
+    <button class="shop-tab s3" id="tab3" onclick="switchShop(3)">🌿 วิชัย<br>ผ่อนแอนดรอยด์</button>
+  </div>
+
+  <!-- SETTINGS CARD -->
+  <div class="card s1" id="settingsCard">
+    <div class="card-header">
+      <div class="card-title"><span class="icon">🏪</span> <span id="settingsTitle">ตั้งค่าร้านวิชัยมาลีเมืองนคร</span></div>
+    </div>
+    <div id="settingsLocked">
+      <div class="lock-left">
+        <p>🔒 ล็อกอยู่</p>
+        <span>ใส่รหัสเพื่อแก้ไขข้อมูลร้าน</span>
+        <div class="lock-pin-row">
+          <input type="password" id="pinInput" placeholder="รหัสผ่าน" maxlength="20" onkeydown="if(event.key==='Enter')unlockSettings()">
+          <button class="btn btn-s1 btn-sm" id="unlockBtn" onclick="unlockSettings()">ปลดล็อก</button>
+        </div>
+        <p id="pinError" class="pin-error">รหัสไม่ถูกต้อง กรุณาลองใหม่</p>
+        <p class="pin-hint">รหัสเริ่มต้น: <strong>1234</strong></p>
+      </div>
+    </div>
+    <div id="settingsOpen" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <span style="font-size:13px;color:var(--success);font-weight:500;">🔓 ปลดล็อกแล้ว</span>
+        <button class="btn btn-outline btn-sm" onclick="lockSettings()">🔒 ล็อก</button>
+      </div>
+      <div class="logo-area">
+        <div>
+          <div class="logo-box" id="logoBox" onclick="document.getElementById('logoInput').click()">
+            <span style="font-size:22px;">📷</span><span>โลโก้</span>
+          </div>
+          <img id="logoPreviewImg" class="logo-preview-img" alt="โลโก้">
+          <input type="file" id="logoInput" accept="image/*" style="display:none" onchange="loadLogo(event)">
+          <button class="logo-remove" id="logoRemoveBtn" onclick="removeLogo()">ลบโลโก้</button>
+        </div>
+        <div class="field" style="flex:1;"><label>ชื่อร้าน</label><input type="text" id="s_shopname"></div>
+      </div>
+      <div class="section-label">ข้อมูลการชำระเงิน</div>
+      <div class="grid-2" style="gap:10px;margin-bottom:10px;">
+        <div class="field"><label>ชื่อธนาคาร</label><input type="text" id="s_bankname"></div>
+        <div class="field"><label>ชื่อบัญชี</label><input type="text" id="s_accname"></div>
+        <div class="field"><label>เลขบัญชี</label><input type="text" id="s_accno"></div>
+        <div class="field"><label>ช่องทางแจ้งโอน</label><input type="text" id="s_slipway"></div>
+        <div class="field"><label>เบอร์โทรร้าน 1</label><input type="text" id="s_phone1"></div>
+        <div class="field"><label>เบอร์โทรร้าน 2</label><input type="text" id="s_phone2" placeholder="เบอร์สำรอง (ถ้ามี)"></div>
+      </div>
+      <div class="save-box">
+        <p>💾 <strong>บันทึกถาวร</strong> — ดาวน์โหลดไฟล์ใหม่ที่มีข้อมูลทั้ง 3 ร้านฝังอยู่แล้ว แล้วอัปโหลดขึ้น GitHub แทนไฟล์เดิม</p>
+        <button class="btn btn-save btn-sm" onclick="exportWithSettings()">📥 ดาวน์โหลดไฟล์พร้อมข้อมูลร้าน</button>
+        <p id="saveStatus" class="save-status"></p>
+      </div>
+      <div class="pw-section">
+        <p class="pw-section-title">🔑 เปลี่ยนรหัสผ่าน (ใช้ร่วมกันทั้ง 3 ร้าน)</p>
+        <div class="grid-3" style="gap:10px;">
+          <div class="field"><label>รหัสเดิม</label><input type="password" id="pw_old" placeholder="รหัสปัจจุบัน"></div>
+          <div class="field"><label>รหัสใหม่</label><input type="password" id="pw_new" placeholder="4+ ตัว"></div>
+          <div class="field"><label>ยืนยัน</label><input type="password" id="pw_confirm" placeholder="พิมพ์อีกครั้ง"></div>
+        </div>
+        <p id="pwMsg" class="pw-msg"></p>
+        <button class="btn btn-outline btn-sm" style="margin-top:10px;" onclick="changePassword()">✓ บันทึกรหัสใหม่</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORM CARD -->
+  <div class="card s1" id="formCard">
+    <div class="card-header">
+      <div class="card-title"><span class="icon">📋</span> ข้อมูลสัญญา</div>
+    </div>
+    <div class="section-label">ข้อมูลทั่วไป</div>
+    <div class="grid-2">
+      <div class="field"><label>วันที่ทำสัญญา</label><input type="date" id="f_date"></div>
+      <div class="field"><label>รหัสลูกค้า</label><input type="text" id="f_custid" placeholder="เช่น C001"></div>
+    </div>
+    <div class="section-label">ข้อมูลลูกค้า</div>
+    <div class="grid-2" style="margin-bottom:12px;">
+      <div class="field"><label>ชื่อ - สกุล</label><input type="text" id="f_name" placeholder="ชื่อเต็ม"></div>
+      <div class="field"><label>Facebook</label><input type="text" id="f_fb" placeholder="ชื่อ Facebook"></div>
+    </div>
+    <div class="grid-3">
+      <div class="field"><label>เบอร์โทร 1</label><input type="tel" id="f_phone1" placeholder="0xx-xxx-xxxx"></div>
+      <div class="field"><label>เบอร์โทร 2</label><input type="tel" id="f_phone2" placeholder="0xx-xxx-xxxx"></div>
+      <div class="field"><label>เลขบัตรประชาชน</label><input type="text" id="f_idcard" placeholder="x-xxxx-xxxxx-xx-x" maxlength="17"></div>
+    </div>
+    <div class="section-label">ข้อมูลสินค้า</div>
+    <div class="grid-2" style="margin-bottom:12px;">
+      <div class="field"><label>รุ่นที่ผ่อน</label><input type="text" id="f_model" placeholder="เช่น iPhone 15 Pro 256GB"></div>
+      <div class="field"><label>IMEI</label><input type="text" id="f_imei" placeholder="15 หลัก" maxlength="15"></div>
+    </div>
+    <!-- Account fields: Apple ID for shop1&2, Gmail+DeviceID for shop3 -->
+    <div id="appleFields" class="grid-2">
+      <div class="field"><label>Apple ID</label><input type="text" id="f_appleid" placeholder="xxx@icloud.com"></div>
+      <div class="field"><label>รหัส Apple ID</label><input type="text" id="f_apidpw" placeholder="รหัสผ่าน"></div>
+    </div>
+    <div id="androidFields" class="grid-3" style="display:none;">
+      <div class="field"><label>Gmail</label><input type="text" id="f_gmail" placeholder="xxx@gmail.com"></div>
+      <div class="field"><label>รหัส Gmail</label><input type="text" id="f_gmailpw" placeholder="รหัสผ่าน"></div>
+      <div class="field"><label>Device ID</label><input type="text" id="f_deviceid" placeholder="Device ID"></div>
+    </div>
+    <div class="section-label">ราคาและการผ่อน</div>
+    <div class="hint-box hint-s1" id="hintBox"><span>ℹ️</span><span>ใส่ <strong>เงินดาวน์</strong> → <strong>เดือนละ</strong> → <strong>จำนวนงวด</strong> ระบบคำนวณราคาสินค้าให้อัตโนมัติ</span></div>
+    <div class="grid-3" style="margin-bottom:12px;">
+      <div class="field"><label>เงินดาวน์ (บาท)</label><input type="number" id="f_down" placeholder="0" oninput="calcPayment()"></div>
+      <div class="field"><label>เดือนละ (บาท)</label><input type="number" id="f_monthly" placeholder="0" oninput="calcPayment()"></div>
+      <div class="field"><label>จำนวนงวด (เดือน)</label><input type="number" id="f_months" placeholder="เช่น 12" min="1" max="24" oninput="calcPayment()"></div>
+    </div>
+    <div class="grid-3">
+      <div class="field"><label>ยอดคงเหลือ (บาท)</label><input type="number" id="f_remain" readonly></div>
+      <div class="field"><label>ราคาสินค้า (บาท)</label><input type="number" id="f_price" readonly></div>
+      <div class="field"><label>ชำระทุกวันที่</label><input type="number" id="f_dueday" placeholder="เช่น 1" min="1" max="31"></div>
+    </div>
+    <button class="btn btn-s1 btn-block" id="printBtn" onclick="printContract()">🖨️ พิมพ์สัญญา</button>
+    <button class="btn btn-outline btn-clear" onclick="clearForm()">↺ ล้างข้อมูลลูกค้า</button>
+    <button class="btn btn-block" id="saveBtn" onclick="saveCustomer()" style="display:none;margin-top:8px;background:#2d5a8a;color:#fff;border-color:#2d5a8a;">💾 บันทึกข้อมูลลูกค้า</button>
+  </div>
+</div>
+
+<script>
+var SAVED_PIN='1234';
+var SAVED_S1=null,SAVED_S1_LOGO=null;
+var SAVED_S2=null,SAVED_S2_LOGO=null;
+var SAVED_S3=null,SAVED_S3_LOGO=null;
+
+var shopPin=SAVED_PIN, currentShop=1;
+var logoData={1:'',2:'',3:''};
+var SHOP_FIELDS=['s_shopname','s_bankname','s_accname','s_accno','s_slipway','s_phone1','s_phone2'];
+var DEFAULTS={
+  1:{s_shopname:'ร้านวิชัยมาลีเมืองนคร',s_bankname:'ธนาคารแลนด์ แอนด์ เฮ้าส์',s_accname:'วิชเวช เอื้ออำพน',s_accno:'801-236-6775',s_slipway:'เพจ FB วิชัยมาลี เมืองนคร',s_phone1:'096-690-5302',s_phone2:''},
+  2:{s_shopname:'ร้าน วิชัย ผ่อนไอโฟน นคร',s_bankname:'ธนาคารเกียรตินาคิน (KKP)',s_accname:'จรรทพร ฤทธิ์รังสรรค์',s_accno:'2068-848-507',s_slipway:'ID Line : @wichaimalee เท่านั้น',s_phone1:'065-360-7178',s_phone2:''},
+  3:{s_shopname:'ร้าน วิชัย ผ่อนแอนดรอยด์ นคร',s_bankname:'ธนาคารเกียรตินาคิน (KKP)',s_accname:'จรรทพร ฤทธิ์รังสรรค์',s_accno:'2068-848-507',s_slipway:'ID Line : @wichaimalee เท่านั้น',s_phone1:'065-360-7178',s_phone2:''}
+};
+var SHOP_COLORS={1:'s1',2:'s2',3:'s3'};
+var SHOP_NAMES={1:'ตั้งค่าร้านวิชัยมาลีเมืองนคร',2:'ตั้งค่าวิชัย ผ่อนไอโฟน นคร',3:'ตั้งค่าวิชัย ผ่อนแอนดรอยด์ นคร'};
+
+var memStore={};
+function storeSet(k,v){try{localStorage.setItem(k,v);}catch(e){memStore[k]=v;}}
+function storeGet(k){try{var r=localStorage.getItem(k);return r!==null?r:(memStore[k]||null);}catch(e){return memStore[k]||null;}}
+
+function applyShopColor(n){
+  var c=SHOP_COLORS[n];
+  ['settingsCard','formCard'].forEach(function(id){
+    var el=document.getElementById(id);
+    el.className='card '+c;
+  });
+  document.getElementById('unlockBtn').className='btn btn-'+c+' btn-sm';
+  document.getElementById('printBtn').className='btn btn-'+c+' btn-block';
+  var hb=document.getElementById('hintBox');
+  hb.className='hint-box hint-'+c;
+  // apple vs android fields
+  if(n===3){
+    document.getElementById('appleFields').style.display='none';
+    document.getElementById('androidFields').style.display='grid';
+  } else {
+    document.getElementById('appleFields').style.display='grid';
+    document.getElementById('androidFields').style.display='none';
+  }
+}
+
+function switchShop(n){
+  currentShop=n;
+  for(var i=1;i<=3;i++){
+    var t=document.getElementById('tab'+i);
+    t.className='shop-tab s'+i+(i===n?' active':'');
+  }
+  document.getElementById('settingsTitle').textContent=SHOP_NAMES[n];
+  applyShopColor(n);
+  loadShopFields(n);
+  lockSettings();
+}
+
+function loadShopFields(n){
+  var raw=storeGet('shop'+n), data=null;
+  if(raw){try{data=JSON.parse(raw);}catch(e){}}
+  if(!data) data=(n===1?SAVED_S1:n===2?SAVED_S2:SAVED_S3);
+  if(!data) data=DEFAULTS[n];
+  SHOP_FIELDS.forEach(function(id){document.getElementById(id).value=data[id]||'';});
+  var savedLogo=storeGet('logo'+n)||(n===1?SAVED_S1_LOGO:n===2?SAVED_S2_LOGO:SAVED_S3_LOGO)||'';
+  logoData[n]=savedLogo;
+  if(savedLogo){
+    document.getElementById('logoPreviewImg').src=savedLogo;
+    document.getElementById('logoPreviewImg').style.display='block';
+    document.getElementById('logoBox').style.display='none';
+    document.getElementById('logoRemoveBtn').style.display='block';
+  } else {
+    document.getElementById('logoPreviewImg').style.display='none';
+    document.getElementById('logoBox').style.display='flex';
+    document.getElementById('logoRemoveBtn').style.display='none';
+  }
+}
+
+function saveShopFields(){
+  var data={};
+  SHOP_FIELDS.forEach(function(id){data[id]=document.getElementById(id).value;});
+  storeSet('shop'+currentShop,JSON.stringify(data));
+  if(logoData[currentShop]) storeSet('logo'+currentShop,logoData[currentShop]);
+}
+SHOP_FIELDS.forEach(function(id){document.getElementById(id).addEventListener('input',saveShopFields);});
+
+function unlockSettings(){
+  if(document.getElementById('pinInput').value===shopPin){
+    document.getElementById('settingsLocked').style.display='none';
+    document.getElementById('settingsOpen').style.display='block';
+    document.getElementById('pinError').style.display='none';
+    document.getElementById('pinInput').value='';
+  } else {
+    document.getElementById('pinError').style.display='block';
+    document.getElementById('pinInput').value='';
+  }
+}
+function lockSettings(){
+  document.getElementById('settingsLocked').style.display='block';
+  document.getElementById('settingsOpen').style.display='none';
+  ['pw_old','pw_new','pw_confirm'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('pwMsg').style.display='none';
+}
+function changePassword(){
+  var old=document.getElementById('pw_old').value,nw=document.getElementById('pw_new').value,cf=document.getElementById('pw_confirm').value;
+  var msg=document.getElementById('pwMsg'); msg.style.display='block';
+  if(old!==shopPin){msg.style.color='#8b2020';msg.textContent='✕ รหัสเดิมไม่ถูกต้อง';return;}
+  if(nw.length<4){msg.style.color='#8b2020';msg.textContent='✕ รหัสใหม่ต้องมีอย่างน้อย 4 ตัว';return;}
+  if(nw!==cf){msg.style.color='#8b2020';msg.textContent='✕ รหัสใหม่ไม่ตรงกัน';return;}
+  shopPin=nw; storeSet('shopPin',nw);
+  msg.style.color='#1e6b3a'; msg.textContent='✓ เปลี่ยนรหัสสำเร็จ — กด "ดาวน์โหลดไฟล์" เพื่อบันทึกถาวร';
+  ['pw_old','pw_new','pw_confirm'].forEach(function(id){document.getElementById(id).value='';});
+}
+function loadLogo(e){
+  var file=e.target.files[0]; if(!file) return;
+  var r=new FileReader();
+  r.onload=function(ev){
+    logoData[currentShop]=ev.target.result;
+    document.getElementById('logoPreviewImg').src=ev.target.result;
+    document.getElementById('logoPreviewImg').style.display='block';
+    document.getElementById('logoBox').style.display='none';
+    document.getElementById('logoRemoveBtn').style.display='block';
+    storeSet('logo'+currentShop,ev.target.result);
+  };
+  r.readAsDataURL(file);
+}
+function removeLogo(){
+  logoData[currentShop]='';
+  document.getElementById('logoPreviewImg').style.display='none';
+  document.getElementById('logoBox').style.display='flex';
+  document.getElementById('logoRemoveBtn').style.display='none';
+  document.getElementById('logoInput').value='';
+  storeSet('logo'+currentShop,'');
+}
+
+function getShopData(n){
+  var raw=storeGet('shop'+n),data=null;
+  if(raw){try{data=JSON.parse(raw);}catch(e){}}
+  return data||(n===1?SAVED_S1:n===2?SAVED_S2:SAVED_S3)||DEFAULTS[n];
+}
+
+function exportWithSettings(){
+  var d1=getShopData(1),d2=getShopData(2),d3=getShopData(3);
+  var l1=storeGet('logo1')||SAVED_S1_LOGO||'';
+  var l2=storeGet('logo2')||SAVED_S2_LOGO||'';
+  var l3=storeGet('logo3')||SAVED_S3_LOGO||'';
+  var pin=shopPin;
+  var currentHtml=document.documentElement.outerHTML;
+  var esc=function(s){return JSON.stringify(s);};
+  var newHtml=currentHtml
+    .replace(/var SAVED_PIN='[^']*';/,"var SAVED_PIN='"+pin.replace(/'/g,"\\'")+"';")
+    .replace(/var SAVED_S1=null/,"var SAVED_S1="+JSON.stringify(d1))
+    .replace(/var SAVED_S1_LOGO=null/,"var SAVED_S1_LOGO="+(l1?esc(l1):'null'))
+    .replace(/var SAVED_S2=null/,"var SAVED_S2="+JSON.stringify(d2))
+    .replace(/var SAVED_S2_LOGO=null/,"var SAVED_S2_LOGO="+(l2?esc(l2):'null'))
+    .replace(/var SAVED_S3=null/,"var SAVED_S3="+JSON.stringify(d3))
+    .replace(/var SAVED_S3_LOGO=null/,"var SAVED_S3_LOGO="+(l3?esc(l3):'null'));
+  var blob=new Blob([newHtml],{type:'text/html;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a'); a.href=url; a.download='index.html';
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
+  var st=document.getElementById('saveStatus');
+  st.style.display='block'; st.style.color='#1e6b3a';
+  st.textContent='✓ ดาวน์โหลดแล้ว! อัปโหลดขึ้น GitHub แทนไฟล์เดิมด้วยครับ';
+}
+
+function calcPayment(){
+  var down=parseFloat(document.getElementById('f_down').value)||0;
+  var monthly=parseFloat(document.getElementById('f_monthly').value)||0;
+  var months=parseInt(document.getElementById('f_months').value)||0;
+  var remain=monthly*months, price=down+remain;
+  document.getElementById('f_remain').value=remain>0?remain:'';
+  document.getElementById('f_price').value=price>0?price:'';
+}
+function v(id){return document.getElementById(id).value||'-';}
+
+function buildRows(months,monthly,dueday,startDate){
+  var rows='',base=startDate?new Date(startDate):new Date();
+  var thM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  var day=parseInt(dueday)||1,bY=base.getFullYear(),bM=base.getMonth();
+  for(var i=1;i<=months;i++){
+    var tot=bM+i,yr=bY+Math.floor(tot/12),mo=tot%12;
+    rows+='<tr><td style="border:1px solid #ccc;padding:5px 8px;text-align:center;">'+i+'</td>'+
+      '<td style="border:1px solid #ccc;padding:5px 8px;text-align:center;">'+Number(monthly).toLocaleString('th-TH')+'</td>'+
+      '<td style="border:1px solid #ccc;padding:5px 8px;text-align:center;">'+day+' '+thM[mo]+' '+(yr+543)+'</td>'+
+      '<td style="border:1px solid #ccc;padding:5px 8px;"></td>'+
+      '<td style="border:1px solid #ccc;padding:5px 8px;"></td></tr>';
+  }
+  return rows;
+}
+function thaiDate(s){
+  if(!s||s==='-')return'-';
+  var d=new Date(s),m=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  return d.getDate()+' '+m[d.getMonth()]+' '+(d.getFullYear()+543);
+}
+
+function getAccountRow(){
+  if(currentShop===3){
+    return '<div class="row"><span class="lbl">Gmail:</span><span class="val">'+v('f_gmail')+'</span><span class="lbl">รหัส:</span><span class="val">'+v('f_gmailpw')+'</span><span class="lbl">IMEI:</span><span class="val">'+v('f_imei')+'</span></div>'+
+      '<div class="row"><span class="lbl">Device ID:</span><span class="val">'+v('f_deviceid')+'</span></div>';
+  }
+  return '<div class="row"><span class="lbl">Apple ID:</span><span class="val">'+v('f_appleid')+'</span><span class="lbl">รหัส:</span><span class="val">'+v('f_apidpw')+'</span><span class="lbl">IMEI:</span><span class="val">'+v('f_imei')+'</span></div>';
+}
+function getCondition1(){
+  if(currentShop===1) return '1. ผ่อนไม่ไหว ขายคืนกลับร้านได้';
+  return '1. ผ่อนไม่ไหว หรือ เครื่องโดนล็อค ขายคืนกลับร้านได้';
+}
+function getUnlockFee(){
+  return currentShop===3 ? '300' : '500';
+}
+
+function printContract(){
+  var months=parseInt(document.getElementById('f_months').value)||12;
+  var monthly=document.getElementById('f_monthly').value||'0';
+  var dateStr=document.getElementById('f_date').value;
+  var p2=document.getElementById('f_phone2').value;
+  var sp2=document.getElementById('s_phone2').value;
+  var logo=logoData[currentShop];
+  var logoHtml=logo?'<img src="'+logo+'" style="height:65px;width:auto;object-fit:contain;display:block;margin:0 auto 6px;">':'';
+  var html='<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">'+
+    '<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600&display=swap" rel="stylesheet">'+
+    '<style>body{font-family:\'Sarabun\',sans-serif;font-size:14px;color:#111;margin:0;padding:20px 28px;}'+
+    '.hd{text-align:center;margin-bottom:12px;}.hd h2{font-size:17px;font-weight:600;margin:0;}'+
+    '.meta{display:flex;justify-content:space-between;font-size:13px;margin-bottom:10px;color:#555;}'+
+    '.row{display:flex;gap:14px;margin-bottom:7px;align-items:baseline;}'+
+    '.lbl{font-size:13px;color:#555;white-space:nowrap;}.val{font-size:14px;flex:1;min-width:60px;}'+
+    'table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px;}'+
+    'th{background:#f0ede8;border:1px solid #ccc;padding:6px 8px;text-align:center;font-weight:600;}'+
+    '.cond{font-size:12px;margin-top:8px;line-height:1.8;}.cond p{margin:1px 0;}'+
+    '.sig{display:flex;justify-content:space-around;margin-top:28px;text-align:center;font-size:13px;}'+
+    '.sig-ln{border-top:1px solid #000;width:180px;margin:0 auto 4px;}'+
+    '.bank{font-size:12px;margin-top:14px;border-top:1px dashed #bbb;padding-top:8px;color:#444;}'+
+    '</style></head><body>'+
+    '<div class="hd">'+logoHtml+'<h2>หนังสือสัญญาเช่าซื้อ '+v('s_shopname')+'</h2></div>'+
+    '<div class="meta"><span>วันที่: '+thaiDate(dateStr)+'</span><span>รหัสลูกค้า: '+v('f_custid')+'</span></div>'+
+    '<div class="row"><span class="lbl">ชื่อ - สกุล:</span><span class="val">'+v('f_name')+'</span><span class="lbl">Facebook:</span><span class="val">'+v('f_fb')+'</span><span class="lbl">เบอร์โทร:</span><span class="val">'+v('f_phone1')+(p2?'<br>'+p2:'')+'</span></div>'+
+    '<div class="row"><span class="lbl">รุ่นที่ผ่อน:</span><span class="val">'+v('f_model')+'</span><span class="lbl">เลขบัตรประชาชน:</span><span class="val">'+v('f_idcard')+'</span></div>'+
+    getAccountRow()+
+    '<div class="row"><span class="lbl">ราคาสินค้า:</span><span class="val">'+Number(document.getElementById('f_price').value||0).toLocaleString('th-TH')+' บาท</span><span class="lbl">เงินดาวน์:</span><span class="val">'+Number(document.getElementById('f_down').value||0).toLocaleString('th-TH')+' บาท</span><span class="lbl">คงเหลือ:</span><span class="val">'+Number(document.getElementById('f_remain').value||0).toLocaleString('th-TH')+' บาท</span></div>'+
+    '<div class="row"><span class="lbl">ผ่อน:</span><span class="val">'+months+' เดือน</span><span class="lbl">เดือนละ:</span><span class="val">'+Number(monthly).toLocaleString('th-TH')+' บาท</span><span class="lbl">ทุกวันที่:</span><span class="val">'+v('f_dueday')+' ของทุกเดือน</span></div>'+
+    '<table><thead><tr><th>งวดที่</th><th>จำนวนเงิน (บาท)</th><th>วันกำหนดชำระ</th><th>วันที่ลูกค้าชำระ</th><th>ผู้รับเงิน</th></tr></thead>'+
+    '<tbody>'+buildRows(months,monthly,v('f_dueday'),dateStr)+'</tbody></table>'+
+    '<div class="cond"><p><strong>*เงื่อนไขการผ่อนชำระสินค้า*</strong></p>'+
+    '<p>'+getCondition1()+'</p>'+
+    '<p>2. ผู้เช่าซื้อจะต้องชำระค่างวดให้ตรงตามวันที่กำหนด</p>'+
+    '<p>3. กรณีผ่อนยังไม่หมด สินค้าถือเป็นกรรมสิทธิ์ของร้านอย่างถูกต้องตามกฎหมาย ในระหว่างผ่อนผู้เช่าซื้อไม่มีสิทธิ์ขายหรือส่งต่อให้ผู้อื่น จนกว่าจะผ่อนชำระหมด เมื่อลูกค้าผ่อนครบตามสัญญา ทางร้านจะทำการปลดล็อค iCloud ออกจากเครื่องให้ทันที</p>'+
+    '<p>4. ค้างชำระค่างวดเกิน 5 วัน ทางร้านจะทำการสั่งล้างข้อมูลเครื่อง และสั่งล็อคเครื่องทันที</p>'+
+    '<p>5. กรณีเรียกคืนสินค้าแล้ว ผู้เช่าไม่ส่งคืนมาให้กับร้าน ทางร้านจะดำเนินคดีกับผู้เช่าซื้อ ซึ่งจะมีความผิดคดีอาญาฐานยักยอกทรัพย์ ตามประมวลกฎหมายอาญา มาตรา 352 ต้องโทษจำคุกไม่เกิน 3 ปี</p>'+
+    '<p>6. กรณีหากเครื่องสั่งล็อกแล้ว ต้องการกลับมาใช้เครื่อง มีค่าปลดล็อก '+getUnlockFee()+' บาท</p></div>'+
+    '<div class="sig"><div><div class="sig-ln"></div><p>ผู้เช่าซื้อ</p></div><div><div class="sig-ln"></div><p>ผู้อนุมัติ</p></div></div>'+
+    '<div class="bank">'+
+    '<p>1. โอนเงินเข้าบัญชี '+v('s_bankname')+' ชื่อบัญชี '+v('s_accname')+' เลขบัญชี '+v('s_accno')+'</p>'+
+    '<p>2. โอนแล้ว ส่งสลิปการโอนมาใน '+v('s_slipway')+' ทุกครั้งหลังโอน '+v('s_phone1')+(sp2?' / '+sp2:'')+'</p>'+
+    '</div>'+
+    '<script>window.onload=function(){window.print();}<\/script></body></html>';
+  var w=window.open('','_blank');
+  if(w){w.document.write(html);w.document.close();}
+  else{alert('กรุณาอนุญาต pop-up ในเบราว์เซอร์ก่อนครับ');}
+}
+
+function clearForm(){
+  ['f_date','f_custid','f_name','f_phone1','f_phone2','f_fb','f_idcard',
+   'f_model','f_imei','f_appleid','f_apidpw','f_gmail','f_gmailpw','f_deviceid',
+   'f_down','f_monthly','f_months','f_remain','f_price','f_dueday'].forEach(function(id){
+    document.getElementById(id).value='';
+  });
+  document.getElementById('f_date').valueAsDate=new Date();
+}
+
+
+function updateSaveBtn(n){
+  var b=document.getElementById('saveBtn');
+  if(b) b.style.display=(n===1)?'flex':'none';
+}
+
+function saveCustomer(){
+  var months=parseInt(document.getElementById('f_months').value)||12;
+  var monthly=parseFloat(document.getElementById('f_monthly').value)||0;
+  var dateStr=document.getElementById('f_date').value;
+  var dueday=parseInt(document.getElementById('f_dueday').value)||1;
+  var base=dateStr?new Date(dateStr):new Date();
+  var thM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  function thDate(s){if(!s)return'-';var d=new Date(s);return d.getDate()+' '+thM[d.getMonth()]+' '+(d.getFullYear()+543);}
+  function num(id){return Number(document.getElementById(id).value||0).toLocaleString('th-TH');}
+
+  var instRows='';
+  for(var i=1;i<=months;i++){
+    var tot=base.getMonth()+i,yr=base.getFullYear()+Math.floor(tot/12),mo=tot%12;
+    instRows+='<tr><td style="text-align:center">'+i+'</td><td style="text-align:center">'+monthly.toLocaleString('th-TH')+'</td><td style="text-align:center">'+dueday+' '+thM[mo]+' '+(yr+543)+'</td><td></td><td></td></tr>';
+  }
+  var profitRows='';
+  for(var j=1;j<=months;j++){
+    profitRows+='<tr style="height:24px"><td></td><td></td><td></td><td></td></tr>';
+  }
+
+  var custid=document.getElementById('f_custid').value||'ลูกค้า';
+  var cname=document.getElementById('f_name').value||'';
+  var p=document.getElementById('f_price').value||0;
+  var dn=document.getElementById('f_down').value||0;
+  var rm=document.getElementById('f_remain').value||0;
+
+  var content='<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">'
+    +'<meta name="viewport" content="width=device-width,initial-scale=1">'
+    +'<title>'+custid+(cname?' '+cname:'')+'</title>'
+    +'<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600&display=swap" rel="stylesheet">'
+    +'<style>'
+    +'*{box-sizing:border-box;margin:0;padding:0}'
+    +'body{font-family:Sarabun,sans-serif;font-size:13px;color:#111;padding:20px}'
+    +'.page{max-width:700px;margin:0 auto}'
+    +'.section{margin-bottom:20px}'
+    +'.section-title{font-size:14px;font-weight:600;padding:8px 12px;border-radius:6px;margin-bottom:10px}'
+    +'.s1{background:#1a5c8a;color:#fff}'
+    +'.s2{background:#8b2020;color:#fff}'
+    +'.s3{background:#FFFF00;color:#000;border:1px solid #ccc}'
+    +'.row{display:flex;gap:8px;margin-bottom:6px;flex-wrap:wrap}'
+    +'.lbl{font-size:12px;color:#555;white-space:nowrap;font-weight:600}'
+    +'.val{font-size:13px;flex:1;border-bottom:1px solid #ccc;padding-bottom:1px;min-width:80px}'
+    +'table{width:100%;border-collapse:collapse;font-size:12px}'
+    +'th{background:#1a5c8a;color:#fff;padding:6px 8px;text-align:center;border:1px solid #aaa}'
+    +'td{padding:5px 8px;border:1px solid #ccc;text-align:center}'
+    +'.th-red{background:#FF0000;color:#fff}'
+    +'.th-grn{background:#92D050;color:#fff}'
+    +'.th-gry{background:#D9D9D9}'
+    +'.profit-hdr{background:#FFFF00;font-weight:600;text-align:center;padding:6px;font-size:13px}'
+    +'.secret-lbl{background:#fce8e8;font-weight:600;text-align:left}'
+    +'.secret-val{background:#fff8f8}'
+    +'@media print{.no-print{display:none}}'
+    +'</style></head><body>'
+    +'<div class="page">'
+
+    // ปุ่ม no-print
+    +'<div class="no-print" style="text-align:center;margin-bottom:16px">'
+    +'<button onclick="window.print()" style="background:#1a5c8a;color:#fff;border:none;padding:10px 28px;border-radius:6px;font-size:15px;font-family:Sarabun,sans-serif;cursor:pointer;margin-right:8px">🖨️ พิมพ์ / บันทึก PDF</button>'
+    +'<button onclick="window.close()" style="background:#888;color:#fff;border:none;padding:10px 20px;border-radius:6px;font-size:15px;font-family:Sarabun,sans-serif;cursor:pointer">✕ ปิด</button>'
+    +'</div>'
+
+    // ส่วน 1: ข้อมูลสัญญา
+    +'<div class="section">'
+    +'<div class="section-title s1">📋 หนังสือสัญญาเช่าซื้อ ร้านวิชัยมาลีเมืองนคร</div>'
+    +'<div class="row"><span class="lbl">วันที่:</span><span class="val">'+thDate(dateStr)+'</span><span class="lbl">รหัสลูกค้า:</span><span class="val">'+v('f_custid')+'</span></div>'
+    +'<div class="row"><span class="lbl">ชื่อ - สกุล:</span><span class="val">'+v('f_name')+'</span><span class="lbl">Facebook:</span><span class="val">'+v('f_fb')+'</span></div>'
+    +'<div class="row"><span class="lbl">เบอร์โทร 1:</span><span class="val">'+v('f_phone1')+'</span><span class="lbl">เบอร์โทร 2:</span><span class="val">'+v('f_phone2')+'</span></div>'
+    +'<div class="row"><span class="lbl">เลขบัตรประชาชน:</span><span class="val">'+v('f_idcard')+'</span></div>'
+    +'<div class="row"><span class="lbl">รุ่นที่ผ่อน:</span><span class="val">'+v('f_model')+'</span><span class="lbl">IMEI:</span><span class="val">'+v('f_imei')+'</span></div>'
+    +'<div class="row"><span class="lbl">Apple ID:</span><span class="val">'+v('f_appleid')+'</span><span class="lbl">รหัส:</span><span class="val">'+v('f_apidpw')+'</span></div>'
+    +'<div class="row"><span class="lbl">ราคาสินค้า:</span><span class="val">'+Number(p).toLocaleString('th-TH')+' บาท</span><span class="lbl">เงินดาวน์:</span><span class="val">'+Number(dn).toLocaleString('th-TH')+' บาท</span><span class="lbl">คงเหลือ:</span><span class="val">'+Number(rm).toLocaleString('th-TH')+' บาท</span></div>'
+    +'<div class="row"><span class="lbl">ผ่อน:</span><span class="val">'+months+' เดือน</span><span class="lbl">เดือนละ:</span><span class="val">'+monthly.toLocaleString('th-TH')+' บาท</span><span class="lbl">ทุกวันที่:</span><span class="val">'+dueday+' ของทุกเดือน</span></div>'
+    +'<br><table><thead><tr><th>งวดที่</th><th>จำนวนเงิน (บาท)</th><th>วันกำหนดชำระ</th><th>วันที่ลูกค้าชำระ</th><th>ผู้รับเงิน</th></tr></thead>'
+    +'<tbody>'+instRows+'</tbody></table>'
+    +'</div>'
+
+    // ส่วน 2: ข้อมูลลับ
+    +'<div class="section">'
+    +'<div class="section-title s2">🔒 ข้อมูลลับ — ห้ามเผยแพร่</div>'
+    +'<table><tbody>'
+    +'<tr><td class="secret-lbl">Apple ID ร้าน:</td><td class="secret-val" colspan="3"></td></tr>'
+    +'<tr><td class="secret-lbl">Password ร้าน:</td><td class="secret-val" colspan="3"></td></tr>'
+    +'<tr><td class="secret-lbl">เบอร์โทรที่ผูก:</td><td class="secret-val" colspan="3"></td></tr>'
+    +'<tr><td class="secret-lbl">Apple ID ลูกค้า:</td><td class="secret-val" colspan="3">'+v('f_appleid')+'</td></tr>'
+    +'<tr><td class="secret-lbl">Password ลูกค้า:</td><td class="secret-val" colspan="3">'+v('f_apidpw')+'</td></tr>'
+    +'<tr><td class="secret-lbl">เวลาหน้าจอ:</td><td class="secret-val" colspan="3"></td></tr>'
+    +'</tbody></table>'
+    +'</div>'
+
+    // ส่วน 3: กำไร-ขาดทุน
+    +'<div class="section">'
+    +'<div class="section-title s3">ยอดกำไร-ขาดทุน</div>'
+    +'<table><thead><tr>'
+    +'<th class="th-red">ขาดทุน</th><th class="th-grn">กำไร</th><th class="th-gry">ลูกค้าชำระ</th><th class="th-gry">ค่าปรับ</th>'
+    +'</tr></thead><tbody>'+profitRows+'</tbody></table>'
+    +'</div>'
+
+    +'</div></body></html>';
+
+  var w=window.open('','_blank');
+  if(w){w.document.write(content);w.document.close();}
+  else{alert('กรุณาอนุญาต pop-up ในเบราว์เซอร์ก่อนครับ');}
+}
+
+var savedPin=storeGet('shopPin');
+if(savedPin) shopPin=savedPin;
+document.getElementById('f_date').valueAsDate=new Date();
+loadShopFields(1);
+lockSettings();
+</script>
+</body>
+</html>
